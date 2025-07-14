@@ -1,14 +1,16 @@
 package ru.mts.media.platform.umc.domain.venue;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import ru.mts.media.platform.umc.domain.gql.types.FullExternalId;
 import ru.mts.media.platform.umc.domain.gql.types.SaveVenueInput;
 import ru.mts.media.platform.umc.domain.gql.types.Venue;
 
-import java.util.function.Function;
+import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VenueDomainService {
@@ -16,18 +18,19 @@ public class VenueDomainService {
     private final VenueSot sot;
     private final VenueDomainServiceMapper mapper;
 
-    public VenueSave save(FullExternalId id, SaveVenueInput input) {
-        var evt = sot.getVenueById(id)
-                .map(applyPatch(input))
+    public Optional<VenueSave> save(FullExternalId id, SaveVenueInput input) {
+        log.info("Before save venue: {}", input);
+
+        Venue venue = sot.getVenueByFullExternalId(id)
+                .map(existing -> mapper.patch(existing, input))
+                .orElseGet(() -> mapper.create(id, input));
+
+        return sot.save(venue)
                 .map(VenueSave::new)
-                .orElse(null);
-
-        eventPublisher.publishEvent(evt);
-
-        return evt;
-    }
-
-    private Function<Venue, Venue> applyPatch(SaveVenueInput updates) {
-        return x -> mapper.patch(x, updates);
+                .map(it -> {
+                    log.info("Resulting venue: {}", it);
+                    eventPublisher.publishEvent(it);
+                    return it;
+                });
     }
 }

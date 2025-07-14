@@ -8,5 +8,7 @@ import java.util.Optional;
 public interface VenueSot {
     Optional<Venue> getVenueByReferenceId(String id);
 
-    Optional<Venue> getVenueById(FullExternalId externalId);
+    Optional<Venue> getVenueByFullExternalId(FullExternalId externalId);
+
+    Optional<Venue> save(Venue venue);
 }

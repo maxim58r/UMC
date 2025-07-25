@@ -8,6 +8,7 @@ import ru.mts.media.platform.umc.domain.gql.types.Venue;
 import ru.mts.media.platform.umc.domain.venue.VenueSot;
 
 import java.util.List;
+import java.util.Optional;
 
 @DgsComponent
 @RequiredArgsConstructor
@@ -23,10 +24,12 @@ public class VenueDgsQuery {
     @DgsData(parentType = "Venue", field = "recentEvents")
     public List<Event> recentEvents(DgsDataFetchingEnvironment dfe,
                                     @InputArgument("limit") Integer limit) {
-        Venue venue = dfe.getSource();
-        if (venue == null || venue.getId() == null) return List.of();
-        if (limit == null || limit <= 0) limit = 5;
-        return eventSot.findEventsByVenueReferenceId(venue.getId(), limit);
+
+        return Optional.ofNullable(dfe)
+                .map(DgsDataFetchingEnvironment::getSource)
+                .map(it -> ((Venue) it).getId())
+                .map(it -> eventSot.findEventsByVenueReferenceId(it, limit))
+                .orElse(null);
     }
 }
 

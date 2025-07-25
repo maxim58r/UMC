@@ -43,10 +43,6 @@ class VenuePgDao implements VenueSot {
 
     @EventListener
     public void handleVenueCreatedEvent(VenueSave evt) {
-        log.info("Venue before created: {}", evt);
-        evt.unwrap()
-                .map(mapper::asEntity)
-                .ifPresent(repository::save);
-        log.info("Venue after created: {}", evt);
+        log.info("handleVenueCreatedEvent: {}", evt);
     }
 }

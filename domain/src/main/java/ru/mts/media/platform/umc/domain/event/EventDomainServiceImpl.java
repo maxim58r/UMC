@@ -2,6 +2,7 @@ package ru.mts.media.platform.umc.domain.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import ru.mts.media.platform.umc.domain.gql.types.CreateEventInput;
@@ -23,6 +24,7 @@ public class EventDomainServiceImpl implements EventDomainService {
     private final EventDomainServiceMapper eventDomainServiceMapper;
     private final VenueSot venueSot;
 
+    @Transactional
     @Override
     public Optional<EventSave> create(CreateEventInput input) {
         List<Venue> list = Optional.ofNullable(input)

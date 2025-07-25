@@ -28,7 +28,6 @@ public class EventPgDao implements EventSot {
                 .toList();
     }
 
-
     @Override
     public Optional<Event> getEventById(UUID id) {
         return eventRepository.findById(id)
